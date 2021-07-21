@@ -17,8 +17,8 @@ int main(int argc, char *argv[]) {
     int threads = _get_threads(argv);
     int cores = _get_cores(argc, argv);
     int clock_interval = _get_clock_interval(argc, argv);
-    init_os(&os, threads, cores, clock_interval);
-    run_scheduler(&os);
+    initOs(&os, threads, cores, clock_interval);
+    runScheduler(&os);
 }
 
 

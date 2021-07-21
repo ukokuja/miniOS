@@ -27,9 +27,9 @@ typedef struct ThreadData {
 } ThreadData;
 
 
-void init_os(OS *os, int _threads, int _cores, int _clock_interval);
+void initOs(OS *os, int _threads, int _cores, int _clock_interval);
 
-void run_scheduler(OS *os);
+void runScheduler(OS *os);
 void taskWake(OS *os, pid_t pid); // Wake a task by its pid.
 char taskShouldSuspend(OS* os, Task* task); // Should the task suspend ?
 void SetTaskName(OS *os, char *);  // Set New current task

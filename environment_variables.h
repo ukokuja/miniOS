@@ -1,0 +1,12 @@
+//
+// Created by lucas on 21/07/2021.
+//
+
+#ifndef MINIOS_ENVIRONMENT_VARIABLES_H
+#define MINIOS_ENVIRONMENT_VARIABLES_H
+#define LOG_FILENAME "logAction.csv"
+#define MAX_TASKS 10
+#define NAME_MAX_LENGTH 19
+#define MAX_THREADS 10
+#define MIN_THREADS 0
+#endif //MINIOS_ENVIRONMENT_VARIABLES_H

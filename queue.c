@@ -82,8 +82,8 @@ int pop(Queue* stack)
     return item;
 }
 
-void log_by_time(Queue* q) {
-    FILE* csv = fopen("log_action.csv","a");
+void logByTime(Queue* q) {
+    FILE* csv = fopen(LOG_FILENAME,"a");
     fprintf(csv, "[");
     int i;
     if (q->rear >= q->front) {
@@ -101,8 +101,8 @@ void log_by_time(Queue* q) {
     fclose(csv);
 }
 
-void log_by_priority(Queue* q) {
-    FILE* csv = fopen("log_action.csv","a");
+void logByPriority(Queue* q) {
+    FILE* csv = fopen(LOG_FILENAME,"a");
     int h;
     fprintf(csv, "[");
     for (h = q->size; h > 1; h--)

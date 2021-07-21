@@ -36,7 +36,7 @@ void push(Queue* stack, int item);
 // Function to remove an item from stack.  It decreases top by 1
 int pop(Queue* stack);
 
-void log_by_time(Queue* q);
+void logByTime(Queue* q);
 
-void log_by_priority(Queue* q);
+void logByPriority(Queue* q);
 #endif //MINIOS_QUEUE_H
