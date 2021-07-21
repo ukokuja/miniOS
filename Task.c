@@ -44,5 +44,6 @@ void init_task(Task *t, int _priority, pthread_t *_thread) {
     t->time = (int) time(NULL);
     t->priority = _priority;
     t->thread = _thread;
+    t->pid = -1000;
     SemInit(&t->sem, 1);
 }

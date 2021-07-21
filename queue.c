@@ -91,9 +91,8 @@ void log_by_time(Queue* q) {
             fprintf(csv,"%d,",q->array[i]);
         fprintf(csv, "%d]", q->array[i]);
     } else {
-        for (i = q->front; i < q->size; i++)
+        for (i = q->front; i <= q->size; i++)
             fprintf(csv,"%d,", q->array[i]);
-
         for (i = 0; i < q->rear; i++)
             fprintf(csv,"%d,", q->array[i]);
         fprintf(csv, "%d]", q->array[i]);

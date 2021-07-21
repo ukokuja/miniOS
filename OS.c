@@ -3,6 +3,7 @@
 //
 
 #define _GNU_SOURCE
+
 #include <sched.h>
 #include "OS.h"
 #include "Task.h"
@@ -11,7 +12,8 @@
 #include <stdlib.h>
 #include <pthread.h>
 #include <unistd.h>
-char run_by_priority = 1; //PRIORITY = stack / TIME = queue
+
+char run_by_priority = 0; //PRIORITY = stack / TIME = queue
 int run = 0;
 Task tasks[MAX_TASKS];
 Queue q;
@@ -20,7 +22,7 @@ int array[MAX_TASKS];
 void *MainTask(void *_thread_data) {
     ThreadData *thread_data = (ThreadData *) _thread_data;
     int taskId = thread_data->taskId;
-    OS* os = thread_data->os;
+    OS *os = thread_data->os;
     taskSetId(&os->tasks[taskId], gettid());
     int t = taskPrio(&os->tasks[taskId]);
     do {
@@ -49,9 +51,13 @@ void init_os(OS *os, int _n, int _cores, int _clock_interval) {
     initQueue(&os->q, array, os->n);
     signal(SIGUSR1, sig_handler);
     for (int i = 0; i < os->n; i++) {
+        sleep(1);
         pthread_t t;
+        __sync_synchronize();
         init_task(&tasks[i], i, &t);
+        __sync_synchronize();
         os->tasks[i] = tasks[i];
+        __sync_synchronize();
         pthread_attr_t at;
         cpu_set_t cpuset;
         CPU_ZERO(&cpuset);
@@ -61,6 +67,7 @@ void init_os(OS *os, int _n, int _cores, int _clock_interval) {
         ThreadData thread_data;
         thread_data.os = os;
         thread_data.taskId = i;
+        __sync_synchronize();
         if (pthread_create(&t, &at, MainTask, (void *) &thread_data)) {
             perror("pthread create 1 error\n");
         }
@@ -70,7 +77,7 @@ void init_os(OS *os, int _n, int _cores, int _clock_interval) {
 }
 
 void run_scheduler(OS *os) {
-    FILE* csv = fopen("log_action.csv","w");
+    FILE *csv = fopen("log_action.csv", "w");
     fprintf(csv, "# sec,");
     for (int h = 0; h < os->n; h++)
         fprintf(csv, "task %d,", h);
@@ -115,11 +122,12 @@ void run_scheduler(OS *os) {
         pthread_join(os->tasks->thread[i], &val);
 }
 
-void log_action(Task *tasks, pid_t current, int n, Queue* queue, char run_by_priority) {
-    FILE* csv = fopen("log_action.csv","a");
+void log_action(Task *tasks, pid_t current, int n, Queue *queue, char run_by_priority) {
+    FILE *csv = fopen("log_action.csv", "a");
     time_t t = time(NULL);
     struct tm tm = *localtime(&t);
-    fprintf(csv, "%d-%02d-%02d %02d:%02d:%02d,", tm.tm_year + 1900, tm.tm_mon + 1, tm.tm_mday, tm.tm_hour, tm.tm_min, tm.tm_sec);
+    fprintf(csv, "%d-%02d-%02d %02d:%02d:%02d,", tm.tm_year + 1900, tm.tm_mon + 1, tm.tm_mday, tm.tm_hour, tm.tm_min,
+            tm.tm_sec);
     for (int h = 0; h < n; h++)
         fprintf(csv, taskGetId(&tasks[h]) == current ? "run," : "suspend,");
     if (run_by_priority)
@@ -132,9 +140,10 @@ void log_action(Task *tasks, pid_t current, int n, Queue* queue, char run_by_pri
 
 void taskWake(OS *os, pid_t pid) {
     for (int i = 0; i < os->n; i++) {
-        if (os->tasks[i].pid == pid)
+        if (os->tasks[i].pid == pid) {
             printf("waking up %d\n", os->tasks[i].pid);
             SemInc(&os->tasks[i].sem);
+        }
     }
 }
 
@@ -143,6 +152,6 @@ void SetTaskName(OS *os, char *name) {
 }
 
 
-char taskShouldSuspend (OS* os, Task* task){
+char taskShouldSuspend(OS *os, Task *task) {
     return os->active == task->pid ? 0 : 1;
 }
