@@ -10,7 +10,7 @@
 #include "Task.h"
 #include "queue.h"
 #include <stdio.h>
-#define MAX_TASKS 10
+#include "environment_variables.h"
 typedef struct OS_struct {
     int n;
     int cores;
@@ -33,6 +33,6 @@ void runScheduler(OS *os);
 void taskWake(OS *os, pid_t pid); // Wake a task by its pid.
 char taskShouldSuspend(OS* os, Task* task); // Should the task suspend ?
 void SetTaskName(OS *os, char *);  // Set New current task
-void log_action(Task *tasks, pid_t current, int n, Queue *queue, char run_by_priority);
-
+void logAction(Task *tasks, pid_t current, int n, Queue *queue, char run_by_priority);
+void swapTasks(Task *a, Task *b);
 #endif //MINIOS_OS_H

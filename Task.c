@@ -18,8 +18,9 @@ pid_t taskGetId (Task* task){
 
 
 void taskSuspend (Task* task){
-    printf("suspending %d \n", task->pid);
+//    printf("suspending %d \n", task->pid);
     SemDec(&task->sem);
+//    printf("woken up %d \n", task->pid);
 }
 
 void taskWait (Task* task, int t){
@@ -45,5 +46,5 @@ void init_task(Task *t, int _priority, pthread_t *_thread) {
     t->priority = _priority;
     t->thread = _thread;
     t->pid = -1000;
-    SemInit(&t->sem, 1);
+//    SemInit(&t->sem, 0);
 }

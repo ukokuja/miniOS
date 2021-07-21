@@ -6,7 +6,7 @@
 #include <stdio.h>
 #include <string.h>
 
-#define NAME_MAX_LENGTH 19
+
 #define MIN(x, y) (((x) < (y)) ? (x) : (y))
 
 void get_random_name (char* name) {

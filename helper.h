@@ -4,5 +4,6 @@
 
 #ifndef MINIOS_HELPER_H
 #define MINIOS_HELPER_H
+#include "environment_variables.h"
 void get_random_name (char* name);
 #endif //MINIOS_HELPER_H

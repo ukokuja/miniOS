@@ -191,7 +191,7 @@ void logAction(Task *tasks, pid_t current, int n, Queue *queue, char run_by_prio
 void taskWake(OS *os, pid_t pid) {
     for (int i = 0; i < os->n; i++) {
         if (os->tasks[i].pid == pid) {
-            printf("waking up %d\n", os->tasks[i].pid);
+//            printf("waking up %d\n", os->tasks[i].pid);
             SemInc(&os->tasks[i].sem);
         }
     }
@@ -204,4 +204,12 @@ void SetTaskName(OS *os, char *name) {
 
 char taskShouldSuspend(OS *os, Task *task) {
     return os->active == task->pid ? 0 : 1;
+}
+
+void swapTasks(Task *a, Task *b)
+{
+    Task* temp;
+    temp = a;
+    a = b;
+    b = temp;
 }

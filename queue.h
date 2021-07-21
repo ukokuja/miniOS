@@ -4,6 +4,7 @@
 
 #ifndef MINIOS_QUEUE_H
 #define MINIOS_QUEUE_H
+#include "environment_variables.h"
 typedef struct QueueStruct {
     int front, rear, size;
     unsigned capacity;
@@ -14,7 +15,7 @@ typedef struct QueueStruct {
 // of given capacity.
 // It initializes size of queue as 0
 void initQueue(Queue* q, int* array, unsigned capacity);
-
+void resetQueue(Queue* q);
 // Queue is full when size becomes
 // equal to the capacity
 int isFull(Queue* queue);

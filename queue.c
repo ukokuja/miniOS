@@ -6,6 +6,7 @@
 #include <limits.h>
 #include <stdio.h>
 #include <stdlib.h>
+
 // function to create a queue
 // of given capacity.
 // It initializes size of queue as 0
@@ -17,6 +18,13 @@ void initQueue(Queue* q, int* array, unsigned capacity)
     // This is important, see the enqueue
     q->rear = capacity - 1;
     q->array = array;
+}
+
+void resetQueue(Queue* q) {
+    q->front = q->size = 0;
+    q->rear = q->capacity - 1;
+    for (int i = 0; i < q->capacity; i++)
+        q->array[i] = -1;
 }
 
 // Queue is full when size becomes
