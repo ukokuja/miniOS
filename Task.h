@@ -26,8 +26,6 @@ char* taskGetName(Task *task); //Returns a unique ascii name of the thread. It i
 pid_t taskGetId(Task *task); // Returns a unique id
 void taskSuspend(Task *task); // Suspends a task until released
 void taskWait(Task *task, int t); // Suspends a task for n seconds.
-char *taskGetMem(Task *task);  // Get the buffer
-void taskReleaseMem(Task *task); // Release the buffer
 int taskPrio(Task *task); // Return the priority of the task
 void taskSetId(Task* task, pid_t _pid);
 #endif //MINIOS_TASK_H

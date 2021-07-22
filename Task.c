@@ -3,9 +3,41 @@
 //
 #include "Task.h"
 
+#include <stdio.h>
+#include <stdlib.h>
 char* taskGetName (Task* task){
-    return "";
-//    return "Task #"snprintf(buf, 12, "pre_%d_suff", i);
+    switch (task->priority) {
+        case 0:
+            return "task 0";
+            break;
+        case 1:
+            return "task 1";
+            break;
+        case 2:
+            return "task 2";
+            break;
+        case 3:
+            return "task 3";
+            break;
+        case 4:
+            return "task 4";
+            break;
+        case 5:
+            return "task 5";
+            break;
+        case 6:
+            return "task 6";
+            break;
+        case 7:
+            return "task 7";
+            break;
+        case 8:
+            return "task 8";
+            break;
+        case 9:
+            return "task 9";
+            break;
+    }
 }
 
 
@@ -27,14 +59,6 @@ void taskWait (Task* task, int t){
     sleep(t+1);
 }
 
-char* taskGetMem (Task* task) {
-    char buff[20];
-    return "buff";
-}
-
-void taskReleaseMem (Task* task){
-//    printf("releasing buff\n");
-}
 
 int taskPrio (Task* task){
     return task->priority;

@@ -40,13 +40,12 @@ void *MainTask(void *_thread_data) {
     do {
         if (taskShouldSuspend(os, &os->tasks[taskId]))
             taskSuspend(&os->tasks[taskId]);
-        printf("executing: task %d with priority %d=%d\n", os->tasks[taskId].pid, os->tasks[taskId].priority, t);
-        char *ptr = taskGetMem(&os->tasks[taskId]);
-//        printf("Cur Task is %s Last Task is %s\n", taskGetName(task), ptr);
-//        SetTaskName(&os, taskGetName(&thread)); // Set New current task
-        taskReleaseMem(&os->tasks[taskId]);
+        char *ptr = taskGetMem(&os->m);
+        printf("Cur Task is %s Last Task is %s\n", taskGetName(&os->tasks[taskId]), ptr);
+        SetTaskName(taskGetName(&os->tasks[taskId])); // Set New current task
+        taskReleaseMem(&os->m);
         taskWait(&os->tasks[taskId], t); // sleep for t seconds
-    } while (1);
+    } while (run);
 }
 
 void sig_handler(int sig) {
@@ -60,6 +59,7 @@ void initOs(OS *os, int _threads, int _cores, int _clock_interval) {
     os->clock_interval = _clock_interval;
     os->tasks = tasks;
     os->q = q;
+    MutexInit(&os->m);
     initQueue(&os->q, array, os->n);
     signal(SIGUSR1, sig_handler);
     for (int i = 0; i < os->n; i++) {
@@ -133,7 +133,7 @@ void runScheduler(OS *os) {
 
 void enqueueTasks(OS *os) {
     for (int h = 0; h < os->n; h++){
-        printf("enqueuing time %d\n", os->tasks[h].time);
+//        printf("enqueuing time %d\n", os->tasks[h].time);
         enqueue(&os->q, taskGetId(&os->tasks[h]));
     }
 }
@@ -197,8 +197,8 @@ void taskWake(OS *os, pid_t pid) {
     }
 }
 
-void SetTaskName(OS *os, char *name) {
-
+void SetTaskName(char *name) {
+    strcpy(buff, name);
 }
 
 
@@ -212,4 +212,14 @@ void swapTasks(Task *a, Task *b)
     temp = a;
     a = b;
     b = temp;
+}
+
+char* taskGetMem (Mutex* m) {
+    MutexAcquire(m);
+    return buff;
+}
+
+
+void taskReleaseMem (Mutex* m){
+    MutexRelease(m);
 }

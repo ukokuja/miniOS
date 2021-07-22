@@ -35,5 +35,5 @@ int _get_threads(char *const *argv) {
 }
 
 char _validate_args(int argc, char **argv) {
-    return argc > 1 || atoi(argv[1]) < MAX_THREADS || atoi(argv[1]) > MIN_THREADS;
+    return argc > 1 || atoi(argv[1]) < MAX_TASKS || atoi(argv[1]) > MIN_TASKS;
 }

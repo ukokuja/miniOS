@@ -7,6 +7,5 @@
 #define LOG_FILENAME "logAction.csv"
 #define MAX_TASKS 10
 #define NAME_MAX_LENGTH 19
-#define MAX_THREADS 10
-#define MIN_THREADS 0
+#define MIN_TASKS 1
 #endif //MINIOS_ENVIRONMENT_VARIABLES_H

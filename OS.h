@@ -11,6 +11,8 @@
 #include "queue.h"
 #include <stdio.h>
 #include "environment_variables.h"
+char buff[20];
+
 typedef struct OS_struct {
     int n;
     int cores;
@@ -18,6 +20,7 @@ typedef struct OS_struct {
     Task *tasks;
     pid_t active;
     Queue q;
+    Mutex m;
 } OS;
 
 
@@ -32,7 +35,9 @@ void initOs(OS *os, int _threads, int _cores, int _clock_interval);
 void runScheduler(OS *os);
 void taskWake(OS *os, pid_t pid); // Wake a task by its pid.
 char taskShouldSuspend(OS* os, Task* task); // Should the task suspend ?
-void SetTaskName(OS *os, char *);  // Set New current task
+void SetTaskName(char *);  // Set New current task
 void logAction(Task *tasks, pid_t current, int n, Queue *queue, char run_by_priority);
 void swapTasks(Task *a, Task *b);
+char* taskGetMem (Mutex*);
+void taskReleaseMem (Mutex*);
 #endif //MINIOS_OS_H
