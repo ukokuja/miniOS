@@ -13,6 +13,7 @@
 #include "environment_variables.h"
 char buff[20];
 
+
 typedef struct OS_struct {
     int n;
     int cores;
