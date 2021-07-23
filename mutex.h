@@ -13,9 +13,12 @@ typedef struct MutexStruct {
 } Mutex;
 
 
-void MutexInitPos(Mutex* m);
-void MutexInit(Mutex* m);
-void MutexAcquire(Mutex* m);
-void MutexRelease(Mutex* m);
+void MutexInitPos(Mutex *m);
+
+void MutexInit(Mutex *m);
+
+void MutexAcquire(Mutex *m);
+
+void MutexRelease(Mutex *m);
 
 #endif //MINIOS_MUTEX_H

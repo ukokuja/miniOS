@@ -16,20 +16,15 @@
 char run_by_priority = 0; //PRIORITY = stack / TIME = queue
 int run = 0;
 Task tasks[MAX_TASKS];
-Queue q;
-int array[MAX_TASKS];
+char buff[BUFF_LENGTH];
 
+void logAction(Task *tasks, int current, int n);
+char *taskGetMem(Mutex *);
+void taskReleaseMem(Mutex *);
 void logHeaders(OS *os);
-
-void restartTasks(OS *os);
-
-void sortByPriority(OS *os);
-
-void pushTasks(OS *os);
-
-void sortByTime(OS *os);
-
-void enqueueTasks(OS *os);
+void restartScheduler(OS *os);
+void taskSetId(Task *task, pid_t _pid);
+void initTask(Task *t, int _priority, pthread_t *_thread);
 
 void *MainTask(void *_thread_data) {
     ThreadData *thread_data = (ThreadData *) _thread_data;
@@ -60,32 +55,9 @@ void initOs(OS *os, int _threads, int _cores, int _clock_interval) {
     os->tasks = tasks;
     os->q = q;
     MutexInit(&os->m);
-    initQueue(&os->q, array, os->n);
+
     signal(SIGUSR1, sig_handler);
-    for (int i = 0; i < os->n; i++) {
-        sleep(1);
-        pthread_t t;
-        __sync_synchronize();
-        init_task(&tasks[i], i, &t);
-        __sync_synchronize();
-        os->tasks[i] = tasks[i];
-        __sync_synchronize();
-        pthread_attr_t at;
-        cpu_set_t cpuset;
-        CPU_ZERO(&cpuset);
-        CPU_SET(i % os->cores, &cpuset);
-        pthread_attr_init(&at);
-        pthread_attr_setaffinity_np(&at, sizeof(cpuset), &cpuset);
-        ThreadData thread_data;
-        thread_data.os = os;
-        thread_data.taskId = i;
-        __sync_synchronize();
-        if (pthread_create(&t, &at, MainTask, (void *) &thread_data)) {
-            perror("pthread create 1 error\n");
-        }
-    }
-    sleep(1);
-    run = 1;
+    initThreads(os);
 }
 
 void runScheduler(OS *os) {
@@ -131,32 +103,6 @@ void runScheduler(OS *os) {
         pthread_join(os->tasks->thread[i], &val);
 }
 
-void enqueueTasks(OS *os) {
-    for (int h = 0; h < os->n; h++){
-//        printf("enqueuing time %d\n", os->tasks[h].time);
-        enqueue(&os->q, taskGetId(&os->tasks[h]));
-    }
-}
-
-void sortByTime(OS *os) {
-    for (int h = 0; h < os->n - 1; h++)
-        for (int j = 0; j < os->n - h - 1; j++)
-            if (os->tasks[j].time > os->tasks[j+1].time)
-                swapTasks(&os->tasks[j], &os->tasks[j + 1]);
-}
-
-void pushTasks(OS *os) {
-    for (int h = 0; h < os->n; h++){
-        push(&os->q, taskGetId(&os->tasks[h]));
-    }
-}
-
-void sortByPriority(OS *os) {
-    for (int h = 0; h < os->n - 1; h++)
-        for (int j = 0; j < os->n - h - 1; j++)
-            if (os->tasks[j].priority > os->tasks[j+1].priority)
-                swapTasks(&os->tasks[j], &os->tasks[j + 1]);
-}
 
 void restartTasks(OS *os) {
     for (int i = 0; i < os->n; i++)
@@ -206,20 +152,13 @@ char taskShouldSuspend(OS *os, Task *task) {
     return os->active == task->pid ? 0 : 1;
 }
 
-void swapTasks(Task *a, Task *b)
-{
-    Task* temp;
-    temp = a;
-    a = b;
-    b = temp;
-}
 
-char* taskGetMem (Mutex* m) {
+char *taskGetMem(Mutex *m) {
     MutexAcquire(m);
     return buff;
 }
 
 
-void taskReleaseMem (Mutex* m){
+void taskReleaseMem(Mutex *m) {
     MutexRelease(m);
 }
