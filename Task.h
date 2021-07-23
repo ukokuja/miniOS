@@ -5,17 +5,16 @@
 #ifndef MINIOS_TASK_H
 #define MINIOS_TASK_H
 
-#include <time.h>
 #include <sys/types.h>
 #include <stdio.h>
 #include <unistd.h>
 #include <string.h>
-#include "semaphore.h"
+#include "environment_variables.h"
+#include "mutex.h"
 
 typedef struct task_struct {
-    int time;
     int priority;
-    Semaphore sem;
+    Mutex m;
     pthread_t *thread;
     pid_t pid;
 } Task;

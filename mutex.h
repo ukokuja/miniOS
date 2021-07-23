@@ -1,12 +1,5 @@
-//
-// Created by lucas on 20/07/2021.
-//
-
 #ifndef MINIOS_MUTEX_H
 #define MINIOS_MUTEX_H
-
-
-#include <stdio.h>
 
 typedef struct MutexStruct {
     char state;

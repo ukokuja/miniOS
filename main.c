@@ -32,19 +32,3 @@ int main(int argc, char *argv[]) {
     runScheduler(&os);
 }
 
-
-int _get_clock_interval(int argc, char *const *argv) {
-    return argc > 3 ? atoi(argv[3]) : 1;
-}
-
-int _get_cores(int argc, char *const *argv) {
-    return argc > 2 ? atoi(argv[2]) : 1;
-}
-
-int _get_threads(char *const *argv) {
-    return atoi(argv[1]);
-}
-
-char _validate_args(int argc, char **argv) {
-    return argc > 1 || atoi(argv[1]) < MAX_TASKS || atoi(argv[1]) > MIN_TASKS;
-}

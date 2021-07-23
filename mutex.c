@@ -1,7 +1,8 @@
-//
-// Created by lucas on 20/07/2021.
-//
+//Libraries
+#include <stdio.h>
+#include <unistd.h>
 
+// miniOS
 #include "mutex.h"
 
 void MutexInitPos(Mutex *m) {
@@ -14,7 +15,7 @@ void MutexInit(Mutex *m) {
 
 void MutexAcquire(Mutex *m) {
     while (!__sync_bool_compare_and_swap(&m->state, 0, 1))
-        usleep(1);
+        usleep(1000);
 };
 
 void MutexRelease(Mutex *m) {

@@ -1,8 +1,4 @@
-//
-// Created by Lucas Kujawski on 16/07/2021.
-//
-#include "Task.h"
-
+// Libraries
 #include <stdio.h>
 #include <stdlib.h>
 // miniOS
@@ -25,10 +21,8 @@ pid_t taskGetId(Task *task) {
     return task->pid;
 }
 
-void taskSuspend (Task* task){
-//    printf("suspending %d \n", task->pid);
-    SemDec(&task->sem);
-//    printf("woken up %d \n", task->pid);
+void taskSuspend(Task *task) {
+    MutexAcquire(&task->m);
 }
 
 void taskWait(int t) {

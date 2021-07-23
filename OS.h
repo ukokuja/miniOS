@@ -1,7 +1,3 @@
-//
-// Created by lucas on 20/07/2021.
-//
-
 #ifndef MINIOS_OS_H
 #define MINIOS_OS_H
 
@@ -13,7 +9,6 @@ typedef struct OS_struct {
     int clock_interval;
     Task *tasks;
     pid_t active;
-    Queue q;
     Mutex m;
 } OS;
 
@@ -25,7 +20,6 @@ typedef struct ThreadData {
 
 
 void initOs(OS *os, int _threads, int _cores, int _clock_interval);
-
 void runScheduler(OS *os);
 //API
 void taskWake(OS *os, pid_t id);
