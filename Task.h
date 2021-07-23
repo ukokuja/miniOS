@@ -5,27 +5,43 @@
 #ifndef MINIOS_TASK_H
 #define MINIOS_TASK_H
 
-#include <time.h>
 #include <sys/types.h>
 #include <stdio.h>
 #include <unistd.h>
 #include <string.h>
-#include "semaphore.h"
+#include "environment_variables.h"
+#include "mutex.h"
 
 typedef struct task_struct {
-    int time;
     int priority;
-    Semaphore sem;
+    Mutex m;
     pthread_t *thread;
     pid_t pid;
 } Task;
 
-void init_task(Task *t, int _priority, pthread_t *_thread);
+// API
+/**
+ * Returns a unique ascii name of the thread. It is less than 19 bytes long.
+ */
+char *taskGetName(Task *task);
 
-char* taskGetName(Task *task); //Returns a unique ascii name of the thread. It is less than 19 bytes long.
-pid_t taskGetId(Task *task); // Returns a unique id
-void taskSuspend(Task *task); // Suspends a task until released
-void taskWait(Task *task, int t); // Suspends a task for n seconds.
-int taskPrio(Task *task); // Return the priority of the task
-void taskSetId(Task* task, pid_t _pid);
+/**
+ * Returns a unique id
+ */
+pid_t taskGetId(Task *task);
+/**
+ * Suspends a task until released
+ */
+void taskSuspend(Task *task);
+
+/**
+ * Suspends a task for n seconds.
+ */
+void taskWait(int t);
+
+/**
+ * Return the priority of the task
+ */
+int taskPrio(Task *task);
+
 #endif //MINIOS_TASK_H

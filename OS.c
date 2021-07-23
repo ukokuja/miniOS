@@ -1,35 +1,28 @@
-//
-// Created by lucas on 20/07/2021.
-//
-
 #define _GNU_SOURCE
-
+// Libraries
 #include <sched.h>
-#include "OS.h"
-#include "Task.h"
 #include <pthread.h>
 #include <stdio.h>
-#include <stdlib.h>
-#include <pthread.h>
 #include <unistd.h>
+#include <sys/signal.h>
+#include "environment_variables.h"
+// miniOS
+#include "OS.h"
+#include "queue.h"
 
-char run_by_priority = 0; //PRIORITY = stack / TIME = queue
+
+char interrupt = 0;
 int run = 0;
 Task tasks[MAX_TASKS];
-Queue q;
-int array[MAX_TASKS];
+char buff[BUFF_LENGTH];
 
+void logAction(Task *tasks, int current, int n);
+char *taskGetMem(Mutex *);
+void taskReleaseMem(Mutex *);
 void logHeaders(OS *os);
-
-void restartTasks(OS *os);
-
-void sortByPriority(OS *os);
-
-void pushTasks(OS *os);
-
-void sortByTime(OS *os);
-
-void enqueueTasks(OS *os);
+void restartScheduler(OS *os);
+void taskSetId(Task *task, pid_t _pid);
+void initTask(Task *t, int _priority, pthread_t *_thread);
 
 void *MainTask(void *_thread_data) {
     ThreadData *thread_data = (ThreadData *) _thread_data;
@@ -42,184 +35,149 @@ void *MainTask(void *_thread_data) {
             taskSuspend(&os->tasks[taskId]);
         char *ptr = taskGetMem(&os->m);
         printf("Cur Task is %s Last Task is %s\n", taskGetName(&os->tasks[taskId]), ptr);
-        SetTaskName(taskGetName(&os->tasks[taskId])); // Set New current task
+        taskSetName(taskGetName(&os->tasks[taskId])); // Set New current task
         taskReleaseMem(&os->m);
-        taskWait(&os->tasks[taskId], t); // sleep for t seconds
-    } while (run);
+        taskWait(t);
+    } while (1);
+    return NULL;
 }
 
-void sig_handler(int sig) {
-    run_by_priority = !run_by_priority;
+void sig_handler() {
+    interrupt = 1;
+}
+
+void initThreads(OS *os) {
+    int i;
+    for (i = 0; i < os->n; i++) {
+        pthread_t t;
+        initTask(&tasks[i], i, &t);
+        os->tasks[i] = tasks[i];
+        pthread_attr_t at;
+        cpu_set_t cpu_set;
+        CPU_ZERO(&cpu_set);
+        CPU_SET(i % os->cores, &cpu_set);
+        pthread_attr_init(&at);
+        pthread_attr_setaffinity_np(&at, sizeof(cpu_set), &cpu_set);
+        ThreadData thread_data = {os, i};
+        if (pthread_create(&t, &at, MainTask, (void *) &thread_data)) {
+            perror("pthread create 1 error\n");
+        }
+        sleep(1);
+    }
+    sleep(1);
+    run = 1;
+
 }
 
 
 void initOs(OS *os, int _threads, int _cores, int _clock_interval) {
+
     os->n = _threads;
     os->cores = _cores;
     os->clock_interval = _clock_interval;
     os->tasks = tasks;
-    os->q = q;
     MutexInit(&os->m);
-    initQueue(&os->q, array, os->n);
+
     signal(SIGUSR1, sig_handler);
-    for (int i = 0; i < os->n; i++) {
-        sleep(1);
-        pthread_t t;
-        __sync_synchronize();
-        init_task(&tasks[i], i, &t);
-        __sync_synchronize();
-        os->tasks[i] = tasks[i];
-        __sync_synchronize();
-        pthread_attr_t at;
-        cpu_set_t cpuset;
-        CPU_ZERO(&cpuset);
-        CPU_SET(i % os->cores, &cpuset);
-        pthread_attr_init(&at);
-        pthread_attr_setaffinity_np(&at, sizeof(cpuset), &cpuset);
-        ThreadData thread_data;
-        thread_data.os = os;
-        thread_data.taskId = i;
-        __sync_synchronize();
-        if (pthread_create(&t, &at, MainTask, (void *) &thread_data)) {
-            perror("pthread create 1 error\n");
-        }
-    }
-    sleep(1);
-    run = 1;
+    initThreads(os);
 }
+
+
 
 void runScheduler(OS *os) {
     logHeaders(os);
+    restartScheduler(os);
+    os->active = deQueue();
     while (run) {
-        resetQueue(&os->q);
-        restartTasks(os);
-        if (run_by_priority) {
-            sortByPriority(os);
-            pushTasks(os);
-            os->active = pop(&os->q);
-            __sync_synchronize();
-        } else {
-            sortByTime(os);
-            enqueueTasks(os);
-            os->active = dequeue(&os->q);
-            __sync_synchronize();
+        taskWake(os, os->active);
+        logAction(os->tasks, os->active, os->n);
+        int prev = os->active;
+        os->active = deQueue();
+        __sync_synchronize();
+        enQueue(prev);
+        if (interrupt) {
+            restartScheduler(os);
+            os->active = deQueue();
         }
-        char is_have_run_by_priority = 0;
-        while (run_by_priority) {
-            is_have_run_by_priority = 1;
-            taskWake(os, os->active);
-            logAction(os->tasks, os->active, os->n, &os->q, run_by_priority);
-            pid_t prev = os->active;
-            os->active = pop(&os->q);
-            __sync_synchronize();
-            push(&os->q, prev);
-            sleep(os->clock_interval);
-        }
-        while (!is_have_run_by_priority && !run_by_priority) {
-            taskWake(os, os->active);
-            logAction(os->tasks, os->active, os->n, &os->q, run_by_priority);
-            pid_t prev = os->active;
-            os->active = dequeue(&os->q);
-            __sync_synchronize();
-            enqueue(&os->q, prev);
-            sleep(os->clock_interval);
-        }
+        sleep(os->clock_interval);
     }
 
     void *val;
     for (int i = 0; i < os->n; i++)
-        pthread_join(os->tasks->thread[i], &val);
+        pthread_join(*os->tasks[i].thread, &val);
 }
 
-void enqueueTasks(OS *os) {
-    for (int h = 0; h < os->n; h++){
-//        printf("enqueuing time %d\n", os->tasks[h].time);
-        enqueue(&os->q, taskGetId(&os->tasks[h]));
+
+void restartScheduler(OS *os) {
+    for (int i = 0; i < os->n; i++) {
+        MutexInitPos(&os->tasks[i].m);
+        deQueue();
+    }
+    if (!interrupt) {
+        for (int i = os->n - 1; i >=0; i--) {
+            for (int j = 0; j < os->n; j++) {
+                if (taskPrio(&os->tasks[j]) == i) {
+                    enQueue(taskGetId(&os->tasks[j]));
+                }
+            }
+        }
+    } else {
+        for (int i = 0; i < os->n; i++) {
+            enQueue(taskGetId(&os->tasks[(i+1)%os->n]));
+        }
+    }
+    interrupt = 0;
+}
+
+
+
+void taskWake(OS *os, pid_t pid) {
+    for (int i = 0; i < os->n; i++) {
+        if (os->tasks[i].pid == pid) {
+            MutexRelease(&os->tasks[i].m);
+        }
     }
 }
 
-void sortByTime(OS *os) {
-    for (int h = 0; h < os->n - 1; h++)
-        for (int j = 0; j < os->n - h - 1; j++)
-            if (os->tasks[j].time > os->tasks[j+1].time)
-                swapTasks(&os->tasks[j], &os->tasks[j + 1]);
+void taskSetName(char *name) {
+    strcpy(buff, name);
 }
 
-void pushTasks(OS *os) {
-    for (int h = 0; h < os->n; h++){
-        push(&os->q, taskGetId(&os->tasks[h]));
-    }
+
+char taskShouldSuspend(OS *os, Task *task) {
+    return os->active != task->pid;
 }
 
-void sortByPriority(OS *os) {
-    for (int h = 0; h < os->n - 1; h++)
-        for (int j = 0; j < os->n - h - 1; j++)
-            if (os->tasks[j].priority > os->tasks[j+1].priority)
-                swapTasks(&os->tasks[j], &os->tasks[j + 1]);
+
+char *taskGetMem(Mutex *m) {
+    MutexAcquire(m);
+    return buff;
 }
 
-void restartTasks(OS *os) {
-    for (int i = 0; i < os->n; i++)
-        SemInit(&os->tasks[i].sem, 0);
+
+void taskReleaseMem(Mutex *m) {
+    MutexRelease(m);
 }
+
 
 void logHeaders(OS *os) {
     FILE *csv = fopen(LOG_FILENAME, "w");
-    fprintf(csv, "# sec,");
+    fprintf(csv, "interrupt, # sec,");
     for (int h = 0; h < os->n; h++)
         fprintf(csv, "task %d,", h);
     fprintf(csv, "Q\n");
     fclose(csv);
 }
 
-void logAction(Task *tasks, pid_t current, int n, Queue *queue, char run_by_priority) {
+void logAction(Task *_tasks, int current, int n) {
     FILE *csv = fopen(LOG_FILENAME, "a");
     time_t t = time(NULL);
     struct tm tm = *localtime(&t);
+    fprintf(csv, "%c,", interrupt == 0 ? '0' : '1');
     fprintf(csv, "%d-%02d-%02d %02d:%02d:%02d,", tm.tm_year + 1900, tm.tm_mon + 1, tm.tm_mday, tm.tm_hour, tm.tm_min,
             tm.tm_sec);
     for (int h = 0; h < n; h++)
-        fprintf(csv, taskGetId(&tasks[h]) == current ? "run," : "suspend,");
-    if (run_by_priority)
-        logByPriority(queue);
-    else
-        logByTime(queue);
+        fprintf(csv, taskGetId(&_tasks[h]) == current ? "run," : "suspend,");
     fclose(csv);
-}
-
-
-void taskWake(OS *os, pid_t pid) {
-    for (int i = 0; i < os->n; i++) {
-        if (os->tasks[i].pid == pid) {
-//            printf("waking up %d\n", os->tasks[i].pid);
-            SemInc(&os->tasks[i].sem);
-        }
-    }
-}
-
-void SetTaskName(char *name) {
-    strcpy(buff, name);
-}
-
-
-char taskShouldSuspend(OS *os, Task *task) {
-    return os->active == task->pid ? 0 : 1;
-}
-
-void swapTasks(Task *a, Task *b)
-{
-    Task* temp;
-    temp = a;
-    a = b;
-    b = temp;
-}
-
-char* taskGetMem (Mutex* m) {
-    MutexAcquire(m);
-    return buff;
-}
-
-
-void taskReleaseMem (Mutex* m){
-    MutexRelease(m);
+    logQueue();
 }

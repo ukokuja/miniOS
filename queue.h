@@ -1,43 +1,15 @@
-//
-// Created by lucas on 20/07/2021.
-//
-
 #ifndef MINIOS_QUEUE_H
 #define MINIOS_QUEUE_H
-#include "environment_variables.h"
-typedef struct QueueStruct {
-    int front, rear, size;
-    unsigned capacity;
-    int* array;
-} Queue;
+#include "queue.h"
+// Check if the queue is full
+int isFull();
 
-// function to create a queue
-// of given capacity.
-// It initializes size of queue as 0
-void initQueue(Queue* q, int* array, unsigned capacity);
-void resetQueue(Queue* q);
-// Queue is full when size becomes
-// equal to the capacity
-int isFull(Queue* queue);
-
-// Queue is empty when size is 0
-int isEmpty(Queue* queue);
-
-// Function to add an item to the queue.
-// It changes rear and size
-void enqueue(Queue* queue, int item);
-
-// Function to remove an item from queue.
-// It changes front and size
-int dequeue(Queue* queue);
-
-// Function to add an item to stack.  It increases top by 1
-void push(Queue* stack, int item);
-
-// Function to remove an item from stack.  It decreases top by 1
-int pop(Queue* stack);
-
-void logByTime(Queue* q);
-
-void logByPriority(Queue* q);
+// Check if the queue is empty
+int isEmpty();
+// Adding an element
+void enQueue(int element);
+// Removing an element
+int deQueue();
+// Display the queue
+void logQueue();
 #endif //MINIOS_QUEUE_H
