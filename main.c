@@ -1,5 +1,8 @@
 #include <stdlib.h>
-#include "OS.h"
+#include "OS/OS.h"
+
+#define RED "\x1B[31m"
+#define RESET "\x1B[0m"
 
 OS os;
 

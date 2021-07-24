@@ -1,4 +1,4 @@
-objects = OS.o Task.o queue.o mutex.o main.o
+objects = OS/OS.o Task/Task.o Queue/queue.o Mutex/mutex.o main.o
 
 all: $(objects)
 	gcc -pthread $(objects) -o miniOS
