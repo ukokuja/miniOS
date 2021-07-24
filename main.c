@@ -6,31 +6,43 @@
 
 OS os;
 
-int _get_clock_interval(int argc, char *const *argv) {
-    return argc > 3 ? atoi(argv[3]) : 1;
-}
 
-int _get_cores(int argc, char *const *argv) {
-    return argc > 2 ? atoi(argv[2]) : 1;
+char _validate_args(int threads, int cores, int interval) {
+    return threads > MIN_TASKS && threads < MAX_TASKS && cores > 0 && interval > 0;
 }
-
-int _get_threads(char *const *argv) {
-    return atoi(argv[1]);
-}
-
-char _validate_args(int argc, char **argv) {
-    return argc > 1 || atoi(argv[1]) < MAX_TASKS || atoi(argv[1]) > MIN_TASKS;
-}
-
 
 int main(int argc, char *argv[]) {
-    if (!_validate_args(argc, argv)) {
-        printf( RED "Invalid arguments\n" RESET);
+    int opt;
+    int threads = -1;
+    int cores = 1;
+    int clock_interval = 1;
+    while ((opt = getopt(argc, argv, "p:n:c:")) != -1) {
+        switch (opt) {
+            case 'n': {
+                char c[10];
+                strcpy(c, optarg);
+                threads = atoi(c);
+                break;
+            }
+            case 'p': {
+                char c[10];
+                strcpy(c, optarg);
+                cores = atoi(c);
+                break;
+            }
+            case 'c': {
+                char c[10];
+                strcpy(c, optarg);
+                clock_interval = atoi(c);
+                break;
+            }
+
+        }
+    }
+    if(!_validate_args(threads, cores, clock_interval)) {
+        printf("Invalid arguments\n");
         exit(1);
     }
-    int threads = _get_threads(argv);
-    int cores = _get_cores(argc, argv);
-    int clock_interval = _get_clock_interval(argc, argv);
     initOs(&os, threads, cores, clock_interval);
     runScheduler(&os);
 }
