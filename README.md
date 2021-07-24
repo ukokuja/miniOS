@@ -1,6 +1,6 @@
 ![alt text](https://www.hit.ac.il/.upload/academic-entrepreneurship/iris/partners/shenkarLogo.jpg "Shenkar")
 
-## Course: Operating Systems ##
+## 🖥️‍ Course: Operating Systems ##
 ### Lecturer: **Raz Ben Yehuda**
 
 Student name            | ID
@@ -15,13 +15,13 @@ Mini OS
 =====================================
 
 ________________
-#### Instructions ####
+#### 🏁 Instructions ####
 1. ```$ make all```
 2. ```$ ./miniOS -p<#processors> -n<#tasks> -c<#clock interval>```
    
 i.e. ```$ ./miniOS -p3 -n4 -c2```
 
-#### Output ####
+#### 🏃 Output ####
 1. In order to see scheduler actions:
    
    ```$ tail -f  logAction.csv```
@@ -35,4 +35,5 @@ Argument            | Default
 | # Clock interval  | 1             
 * field is mandatory
 
-
+#### 💿‍ Class Diagram ####
+![Class](https://i.imgur.com/y9iXWnx.png)

@@ -1,5 +1,8 @@
 #include <stdlib.h>
-#include "OS.h"
+#include "OS/OS.h"
+
+#define RED "\x1B[31m"
+#define RESET "\x1B[0m"
 
 OS os;
 
@@ -22,7 +25,7 @@ char _validate_args(int argc, char **argv) {
 
 int main(int argc, char *argv[]) {
     if (!_validate_args(argc, argv)) {
-        printf("Invalid arguments\n");
+        printf( RED "Invalid arguments\n" RESET);
         exit(1);
     }
     int threads = _get_threads(argv);

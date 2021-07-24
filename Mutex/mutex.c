@@ -1,24 +1,23 @@
 //Libraries
 #include <stdio.h>
-#include <unistd.h>
 
 // miniOS
 #include "mutex.h"
 
 void MutexInitPos(Mutex *m) {
-    m->state = 1;
+    mtx->lock = LOCKED;
 };
 
 void MutexInit(Mutex *m) {
-    m->state = 0;
+    mtx->lock = UNLOCKED;
 };
 
 void MutexAcquire(Mutex *m) {
-    while (!__sync_bool_compare_and_swap(&m->state, 0, 1))
+    while (!__sync_bool_compare_and_swap(&m->state, UNLOCKED, LOCKED))
         usleep(1000);
 };
 
 void MutexRelease(Mutex *m) {
-    m->state = 0;
+    m->state = UNLOCKED;
     __sync_synchronize();
 }
