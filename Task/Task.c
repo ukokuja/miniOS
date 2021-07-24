@@ -4,11 +4,21 @@
 // miniOS
 #include "Task.h"
 
+#define YEL "\x1B[33m"
+#define RESET "\x1B[0m"
+
 char name[NAME_MAX_LENGTH];
 
 
+void initTask(Task *t, int _priority, pthread_t *_thread) {
+    t->priority = _priority;
+    t->thread = _thread;
+    t->pid = -1000;
+    MutexInitPos(&t->m);   
+}
+
 char *taskGetName(Task *task) {
-        snprintf(name, NAME_MAX_LENGTH, "Task %d", task->priority);
+        snprintf(name, NAME_MAX_LENGTH, YEL "Task %d" RESET, task->pid);
         return name;
 }
 
@@ -33,9 +43,3 @@ int taskPrio(Task *task) {
     return task->priority;
 }
 
-void initTask(Task *t, int _priority, pthread_t *_thread) {
-    t->priority = _priority;
-    t->thread = _thread;
-    t->pid = -1000;
-    MutexInitPos(&t->m);
-}
