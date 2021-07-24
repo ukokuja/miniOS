@@ -8,7 +8,7 @@ all: $(objects)
 
 
 clean:
-	rm *.o main logAction.csv
+	rm *.o miniOS logAction.csv
 
 rebuild:
 	clean all
