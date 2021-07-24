@@ -26,6 +26,20 @@ i.e. ```$ ./miniOS -p3 -n4 -c2```
    
    ```$ tail -f  logAction.csv```
 ________________
+### API ###
+
+Method            | Location
+| -------------     |-------------  
+|void taskWake(OS *os, pid_t id) | OS/OS.h
+|char taskShouldSuspend(OS *os, Task *task) | OS/OS.h
+|void taskSetName(char *) | OS/OS.h
+|void taskSetId(Task *task, pid_t _pid) | Task/Task.h
+|char *taskGetName(Task *task)| Task/Task.h
+|pid_t taskGetId(Task *task)| Task/Task.h
+|void taskSuspend(Task *task)| Task/Task.h
+|void taskWait(int t)| Task/Task.h
+|int taskPrio(Task *task)| Task/Task.h
+
 Defaults:
 
 Argument            | Default       

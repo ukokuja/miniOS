@@ -18,7 +18,7 @@ void initTask(Task *t, int _priority, pthread_t *_thread) {
 }
 
 char *taskGetName(Task *task) {
-        snprintf(name, NAME_MAX_LENGTH, YEL "Task %d", task->priority RESET);
+        snprintf(name, NAME_MAX_LENGTH, YEL "Task %d" RESET, task->pid);
         return name;
 }
 

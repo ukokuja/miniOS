@@ -5,11 +5,11 @@
 #include "mutex.h"
 
 void MutexInitPos(Mutex *m) {
-    mtx->lock = LOCKED;
+    m->state = LOCKED;
 };
 
 void MutexInit(Mutex *m) {
-    mtx->lock = UNLOCKED;
+    m->state = UNLOCKED;
 };
 
 void MutexAcquire(Mutex *m) {

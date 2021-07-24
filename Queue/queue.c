@@ -8,14 +8,15 @@
 #define RESET "\x1B[0m"
 
 
+/**
+ * @details one way to sort (and default one) is task's priority and seconed is random.
+ * @param {Array<int>} items, array of tasks PID, all are locks except the pop one.
+ * @param {int} front,  Mutex for locking.
+ * @param {int} rear, the currrent thread that running in the task.
+ */
 int items[MAX_TASKS];
 int front = -1, rear = -1;
 
-// void initQueue(Queue q) {
-//     q->items = items;
-//     q->front = -1;
-//     q->rear = -1;
-// }
 
 
 int isFull() {
