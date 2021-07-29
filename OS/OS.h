@@ -43,20 +43,21 @@ typedef struct ThreadData
 void initOs(OS *os, int _threads, int _cores, int _clock_interval);
 
 /**
- * start the scheduler thar run ensless.
+ * start the scheduler that run endless.
  * @param {OS}* os, the current os of the program .
  */
 void runScheduler(OS *os);
 
 /**
- * run spetcific test from the queue test, and return it to the queue by his sort.
+ * Wake task by its PID
  * @param {OS}* os, the current os of the program .
+ * @param {pid_t} pid, tasks pid to wake.
  */
 void taskWake(OS *os, pid_t id);
 
 /**
- * run spetcific test from the queue test, and return it to the queue by his sort.
- * @param {OS}* os, the current os of the program .
+ * returns weather the tasks should be suspended
+ * @param {OS}* os, the current os of the program.
  */
 char taskShouldSuspend(OS *os, Task *task);
 

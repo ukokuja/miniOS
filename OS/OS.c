@@ -87,7 +87,7 @@ void *MainTask(void *_thread_data)
         if (taskShouldSuspend(os, &os->tasks[taskId]))
             taskSuspend(&os->tasks[taskId]);
         char *ptr = taskGetMem(&os->m);
-        printf( YEL "Cur Task is %s Last Task is %s\n" RESET, taskGetName(&os->tasks[taskId]), ptr);
+        printf("Cur Task is %s %s %s Last Task is %s %s\n" RESET, YEL, taskGetName(&os->tasks[taskId]), RESET, YEL, ptr);
         taskSetName(taskGetName(&os->tasks[taskId])); // Set New current task
         taskReleaseMem(&os->m);
         taskWait(t);

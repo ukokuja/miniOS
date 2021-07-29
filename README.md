@@ -21,10 +21,23 @@ ________________
    
 i.e. ```$ ./miniOS -p3 -n4 -c2```
 
+
+Defaults:
+
+Argument            | Default
+| -------------     |-------------  
+| # Tasks *         | -
+| # Processor       | 1
+| # Clock interval  | 1
+* field is mandatory
+
 #### 🏃 Output ####
 1. In order to see scheduler actions:
    
    ```$ tail -f  logAction.csv```
+
+![Class](https://i.imgur.com/iy8f2Q7.png)
+
 ________________
 ### API ###
 
@@ -40,14 +53,17 @@ Method            | Location
 |void taskWait(int t)| Task/Task.h
 |int taskPrio(Task *task)| Task/Task.h
 
-Defaults:
-
-Argument            | Default       
-| -------------     |-------------  
-| # Tasks *         | -             
-| # Processor       | 1             
-| # Clock interval  | 1             
-* field is mandatory
 
 #### 💿‍ Class Diagram ####
 ![Class](https://i.imgur.com/y9iXWnx.png)
+
+Explanation
+=============
+* Scheduler: The scheduler wakes up every t seconds, pops one task from the queue and releases the lock.
+  Each task in the queue is locked by mutex. Only the current task is unlocked and running in the OS.
+  Every task suspends himself on the main task.
+  
+* Queue: The queue was implemented using an array and have FIFO behaviour. The first sorting is by priority, and after
+  an interrupt (signal) is sequencially. 
+
+* Buffer: The buffer modification is considered a critical section. It is protected by the OS Mutex. 
